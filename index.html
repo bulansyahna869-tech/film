@@ -1,0 +1,513 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MELOLO - Movie Streaming</title>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #101014;
+            color: white;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 6%;
+            background: #17171d;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: bold;
+            color: #ff365e;
+            letter-spacing: 2px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .search {
+            padding: 11px 15px;
+            border-radius: 25px;
+            border: 1px solid #393943;
+            background: #25252d;
+            color: white;
+            outline: none;
+            width: 210px;
+        }
+
+        .hero {
+            min-height: 360px;
+            padding: 75px 7%;
+            display: flex;
+            align-items: center;
+            background:
+                linear-gradient(90deg, #101014 5%, #101014dd 45%, transparent),
+                linear-gradient(0deg, #101014, transparent 50%),
+                url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80")
+                center/cover;
+        }
+
+        .hero-content {
+            max-width: 520px;
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 6vw, 58px);
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            color: #d0d0d5;
+            line-height: 1.7;
+            margin-bottom: 22px;
+        }
+
+        .btn {
+            border: none;
+            background: #ff365e;
+            color: white;
+            padding: 12px 22px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: #e62149;
+        }
+
+        main {
+            padding: 30px 6%;
+        }
+
+        .section-title {
+            margin-bottom: 18px;
+            font-size: 23px;
+        }
+
+        .categories {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .category {
+            background: #24242c;
+            color: white;
+            border: 1px solid #393943;
+            padding: 9px 17px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .category.active,
+        .category:hover {
+            background: #ff365e;
+            border-color: #ff365e;
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .movie-card {
+            background: #1b1b22;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform .2s;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .poster {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+            background: #292932;
+        }
+
+        .movie-info {
+            padding: 13px;
+        }
+
+        .movie-info h3 {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .movie-info p {
+            font-size: 12px;
+            color: #aaaab5;
+            margin-bottom: 12px;
+        }
+
+        .watch-btn {
+            width: 100%;
+            padding: 9px;
+            border: none;
+            border-radius: 6px;
+            background: #ff365e;
+            color: white;
+            cursor: pointer;
+        }
+
+        .empty {
+            color: #aaaab5;
+            padding: 30px 0;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            background: #000e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            width: 100%;
+            max-width: 850px;
+            background: #1b1b22;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .close-btn {
+            background: #ff365e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 13px;
+            cursor: pointer;
+        }
+
+        video {
+            width: 100%;
+            max-height: 65vh;
+            background: black;
+            border-radius: 8px;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 25px;
+            text-align: center;
+            background: #17171d;
+            color: #999;
+        }
+
+        [x-cloak] {
+            display: none !important;
+        }
+
+        @media (max-width: 1000px) {
+            .movie-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            nav {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-wrap: wrap;
+                padding: 16px 5%;
+            }
+
+            .logo {
+                font-size: 23px;
+            }
+
+            .search {
+                width: 100%;
+            }
+
+            .hero {
+                min-height: 320px;
+                padding: 45px 6%;
+            }
+
+            .movie-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .poster {
+                height: 200px;
+            }
+
+            main {
+                padding: 25px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body x-data="meloloApp()">
+
+    <header>
+        <div class="logo">MELOLO</div>
+
+        <nav>
+            <a href="#home">Beranda</a>
+            <a href="#movies">Film</a>
+            <a href="#about">Tentang</a>
+        </nav>
+
+        <input
+            class="search"
+            type="search"
+            placeholder="Cari film..."
+            x-model="search"
+        >
+    </header>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>MELOLO</h1>
+            <p>
+                Temukan film favoritmu di satu tempat.
+                Jelajahi berbagai pilihan film dan nikmati
+                pengalaman menonton dengan tampilan modern.
+            </p>
+            <button class="btn"
+                @click="$el.closest('body').querySelector('#movies').scrollIntoView({behavior:'smooth'})">
+                ▶ Jelajahi Film
+            </button>
+        </div>
+    </section>
+
+    <main id="movies">
+        <h2 class="section-title">Kategori Film</h2>
+
+        <div class="categories">
+            <template x-for="cat in categories" :key="cat">
+                <button
+                    class="category"
+                    :class="{ active: category === cat }"
+                    @click="category = cat"
+                    x-text="cat">
+                </button>
+            </template>
+        </div>
+
+        <h2 class="section-title">Pilihan Film</h2>
+
+        <div class="movie-grid">
+            <template x-for="movie in filteredMovies()" :key="movie.id">
+                <article class="movie-card">
+                    <img
+                        class="poster"
+                        :src="movie.poster"
+                        :alt="movie.title"
+                        loading="lazy"
+                    >
+
+                    <div class="movie-info">
+                        <h3 x-text="movie.title"></h3>
+                        <p>
+                            <span x-text="movie.year"></span>
+                            ·
+                            <span x-text="movie.genre"></span>
+                        </p>
+
+                        <button class="watch-btn"
+                            @click="openMovie(movie)">
+                            ▶ Tonton
+                        </button>
+                    </div>
+                </article>
+            </template>
+        </div>
+
+        <p class="empty"
+            x-show="filteredMovies().length === 0">
+            Film tidak ditemukan.
+        </p>
+    </main>
+
+    <!-- Pemutar film -->
+    <div class="modal"
+         x-cloak
+         x-show="selectedMovie"
+         @keydown.escape.window="closeMovie()"
+         @click.self="closeMovie()">
+
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 x-text="selectedMovie ? selectedMovie.title : ''"></h2>
+                <button class="close-btn" @click="closeMovie()">
+                    ✕ Tutup
+                </button>
+            </div>
+
+            <video
+                x-ref="player"
+                controls
+                playsinline
+                :src="selectedMovie ? selectedMovie.video : ''">
+                Browser kamu tidak mendukung video.
+            </video>
+
+            <p style="color:#aaa; margin-top:12px; font-size:13px">
+                Gunakan video milik sendiri atau sumber streaming
+                yang kamu punya izin untuk gunakan.
+            </p>
+        </div>
+    </div>
+
+    <footer id="about">
+        <p>© 2026 MELOLO · Movie Streaming Website</p>
+        <p style="margin-top:8px">Dibuat dengan HTML, CSS, dan Alpine.js</p>
+    </footer>
+
+    <script>
+        function meloloApp() {
+            return {
+                search: "",
+                category: "Semua",
+                selectedMovie: null,
+
+                categories: [
+                    "Semua",
+                    "Action",
+                    "Drama",
+                    "Romance",
+                    "Comedy",
+                    "Animation"
+                ],
+
+                // Data contoh untuk tampilan awal.
+                // Ganti dengan data film dari API yang sah.
+                movies: [
+                    {
+                        id: 1,
+                        title: "Big Buck Bunny",
+                        year: 2024,
+                        genre: "Animation",
+                        poster: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=500&q=80",
+                        video: "https://www.w3schools.com/html/mov_bbb.mp4"
+                    },
+                    {
+                        id: 2,
+                        title: "Movie Adventure",
+                        year: 2025,
+                        genre: "Action",
+                        poster: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=500&q=80",
+                        video: "https://www.w3schools.com/html/movie.mp4"
+                    },
+                    {
+                        id: 3,
+                        title: "Romantic Story",
+                        year: 2025,
+                        genre: "Romance",
+                        poster: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=500&q=80",
+                        video: "https://www.w3schools.com/html/mov_bbb.mp4"
+                    },
+                    {
+                        id: 4,
+                        title: "The Drama",
+                        year: 2024,
+                        genre: "Drama",
+                        poster: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=500&q=80",
+                        video: "https://www.w3schools.com/html/movie.mp4"
+                    },
+                    {
+                        id: 5,
+                        title: "Funny Days",
+                        year: 2025,
+                        genre: "Comedy",
+                        poster: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=500&q=80",
+                        video: "https://www.w3schools.com/html/mov_bbb.mp4"
+                    }
+                ],
+
+                filteredMovies() {
+                    return this.movies.filter(movie => {
+                        const matchesSearch = movie.title
+                            .toLowerCase()
+                            .includes(this.search.toLowerCase());
+
+                        const matchesCategory =
+                            this.category === "Semua" ||
+                            movie.genre === this.category;
+
+                        return matchesSearch && matchesCategory;
+                    });
+                },
+
+                openMovie(movie) {
+                    this.selectedMovie = movie;
+                    this.$nextTick(() => {
+                        this.$refs.player.load();
+                    });
+                },
+
+                closeMovie() {
+                    this.$refs.player.pause();
+                    this.$refs.player.removeAttribute("src");
+                    this.$refs.player.load();
+                    this.selectedMovie = null;
+                }
+            };
+        }
+
+        /*
+        INTEGRASI API
+
+        API KEY yang kamu berikan:
+        b63b2b42e5c66e402abda57cf1a39e52
+
+        Untuk mengambil daftar film sungguhan, kamu masih perlu:
+        1. URL endpoint API.
+        2. Format respons JSON dari penyedia API.
+        3. Nama parameter autentikasi yang diwajibkan API.
+
+        Jangan menganggap API key saja sudah cukup untuk mengambil
+        film. Jangan membagikan key privat di website publik.
+        */
+    </script>
+
+</body>
+</html>
